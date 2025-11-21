@@ -16,7 +16,6 @@ elif environment == Environnement.test.value:
     # from .test import *
 else:
     from .local import *
-
-print()
-print(f"🚀 Django run in: {environment} environment.")
-print()
+    print()
+    print(f"🚀 Django run in: {environment} environment.")
+    print()
