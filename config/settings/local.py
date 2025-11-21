@@ -15,19 +15,3 @@ DATABASES = {
 
 # Console email backend to test email in local
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-
-# Django REST Framework - dev settings
-INSTALLED_APPS += [
-    "rest_framework",
-]
-
-REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticated",
-    ],
-    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
-    "PAGE_SIZE": 10,
-    "DEFAULT_RENDERER_CLASSES": [
-        "rest_framework.renderers.JSONRenderer",
-    ],
-}
