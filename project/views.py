@@ -1,12 +1,12 @@
-from django.conf import settings
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema, extend_schema_view
-from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from project.models import Project
+from user.models import User
+from user.serializers import UserSerializer
 
 from .serializers import ProjectSerializer
 
@@ -73,8 +73,6 @@ class ProjectModelViewSet(ModelViewSet):
     def _list_contributors(self, project):
         """Private method to handle GET logic"""
         contributors = project.contributors.all()
-        from user.serializers import UserSerializer
-
         serializer = UserSerializer(contributors, many=True)
         return Response(serializer.data)
 
@@ -82,18 +80,15 @@ class ProjectModelViewSet(ModelViewSet):
         """Private method to handle POST logic"""
         user_id = request.data.get("user_id")
         if not user_id:
-            return Response({"error": "user_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "user_id is required"}, status=400)
 
-        from django.apps import apps
-
-        UserModel = apps.get_model(settings.AUTH_USER_MODEL)
-        user = get_object_or_404(UserModel, pk=user_id)
+        user = get_object_or_404(User, pk=user_id)
 
         if user in project.contributors.all():
-            return Response({"error": "User is already a contributor"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "User is already a contributor"}, status=400)
 
         project.contributors.add(user)
-        return Response({"message": f"User {user.username} added as contributor"}, status=status.HTTP_201_CREATED)
+        return Response({"message": f"User {user.username} added as contributor"}, status=201)
 
     @extend_schema(
         methods=["DELETE"],
@@ -109,18 +104,16 @@ class ProjectModelViewSet(ModelViewSet):
         <br>**Authentification required**: Yes
         <br>**Permissions required**: None
         """
+
+        if not user_id:
+            return Response({"error": "user_id is required in url"}, status=400)
+
         project = self.get_object()
 
-        user = settings.AUTH_USER_MODEL
-        from django.apps import apps
-
-        UserModel = apps.get_model(user)
-        user = get_object_or_404(UserModel, pk=user_id)
+        user = get_object_or_404(User, pk=user_id)
 
         if user not in project.contributors.all():
-            return Response({"error": "User is not a contributor of this project"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "User is not a contributor of this project"}, status=400)
 
         project.contributors.remove(user)
-        return Response(
-            {"message": f"User {user.username} removed from contributors"}, status=status.HTTP_204_NO_CONTENT
-        )
+        return Response({"message": f"User {user.username} removed from contributors"}, status=200)
