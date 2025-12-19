@@ -9,10 +9,10 @@ logger = logging.getLogger("projects")
 
 class Project(models.Model):
     class ProjectTypes(models.TextChoices):
-        backend = "backend"
-        frontend = "frontend"
-        ios = "ios"
-        android = "android"
+        backend = "backend", "Back-end"
+        frontend = "frontend", "Front-end"
+        ios = "ios", "iOS"
+        android = "android", "Android"
 
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="projects")
     contributors = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="contributed_projects")
