@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class Environnement(str, Enum):
+class Environment(str, Enum):
     local = "local"
     production = "production"
     test = "test"
