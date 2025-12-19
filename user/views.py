@@ -1,16 +1,14 @@
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample, extend_schema_view
-from drf_spectacular.types import OpenApiTypes
-from .models import User
-from .permissions import IsUserSelf
+
 from user.serializers import UserSerializer
 
+from .models import User
+from .permissions import IsUserSelf
 
-@extend_schema(
-    summary="Create a user account",
-    tags=["User"]
-    )
+
+@extend_schema(summary="Create a user account", tags=["User"])
 class SignupView(CreateAPIView):
     """
     Represents a view for handling user signup operations in order to create a new account.

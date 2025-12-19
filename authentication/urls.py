@@ -1,6 +1,7 @@
 from django.urls import path
 
-from .views import LogoutView, DecoratedTokenRefreshView, DecoratedTokenObtainPairView
+from .views import DecoratedTokenObtainPairView, DecoratedTokenRefreshView, LogoutView
+
 
 app_name = "auth"
 

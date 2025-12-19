@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -14,14 +15,14 @@ logger = logging.getLogger(__name__)
     post=extend_schema(
         summary="Obtain Obtain JWT token pair",
         description="Takes a set of user credentials and returns an access and refresh JSON web token "
-                    "pair. "
-                    "<br>Returns a `200` response code on success. "
-                    "<br>Raises a `400` error code if the request body is not valid. "
-                    "<br>Raises a `401` error code if the user credentials are invalid."
-                    "<br>"
-                    "<br>**Authentification required**: No"
-                    "<br>**Permissions required**: None ",
-        tags=["Auth"]
+        "pair. "
+        "<br>Returns a `200` response code on success. "
+        "<br>Raises a `400` error code if the request body is not valid. "
+        "<br>Raises a `401` error code if the user credentials are invalid."
+        "<br>"
+        "<br>**Authentification required**: No"
+        "<br>**Permissions required**: None ",
+        tags=["Auth"],
     )
 )
 class DecoratedTokenObtainPairView(TokenObtainPairView):
@@ -32,25 +33,21 @@ class DecoratedTokenObtainPairView(TokenObtainPairView):
     post=extend_schema(
         summary="Refresh JWT token",
         description="Takes a refresh type JSON web token and returns an access type JSON web token if the refresh "
-                    "token is valid. "
-                    "<br>Returns a `200` response code on success."
-                    "<br>Raises a `400` error code if the request body is not valid."
-                    "<br>Raises a `401` error code if the refresh token is invalid."
-                    "<br>"
-                    "<br>**Authentification required**: No"
-                    "<br>**Permissions required**: None",
-        tags=["Auth"]
+        "token is valid. "
+        "<br>Returns a `200` response code on success."
+        "<br>Raises a `400` error code if the request body is not valid."
+        "<br>Raises a `401` error code if the refresh token is invalid."
+        "<br>"
+        "<br>**Authentification required**: No"
+        "<br>**Permissions required**: None",
+        tags=["Auth"],
     )
 )
 class DecoratedTokenRefreshView(TokenRefreshView):
     pass
 
 
-@extend_schema_view(
-    post=extend_schema(
-        summary="Logout user and invalidate refresh token",
-        tags=["Auth"])
-)
+@extend_schema_view(post=extend_schema(summary="Logout user and invalidate refresh token", tags=["Auth"]))
 class LogoutView(APIView):
     """
     Represents the user view for logout.
