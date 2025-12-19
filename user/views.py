@@ -35,7 +35,7 @@ class SignupView(CreateAPIView):
         tags=["User"],
     ),
     patch=extend_schema(
-        summary="Update one or plus user's profile fields",
+        summary="Update one or many user's profile fields",
         tags=["User"],
     ),
     delete=extend_schema(
