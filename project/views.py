@@ -1,12 +1,13 @@
 from django.shortcuts import get_object_or_404
-from drf_spectacular.utils import extend_schema, extend_schema_view
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from project.models import Project
 from user.models import User
-from user.serializers import UserSerializer
+from user.serializers import ContributorSerializer, UserSerializer
 
 from .serializers import ProjectSerializer
 
@@ -47,12 +48,18 @@ class ProjectModelViewSet(ModelViewSet):
         summary="List all contributors of a Project",
         description="Returns the list of all users who are contributors to this Project.",
         tags=["Project Contributors"],
+        responses={200: UserSerializer(many=True)},
     )
     @extend_schema(
         methods=["POST"],
         summary="Add a contributor to a Project",
         description="Add a user as a contributor to this Project.",
         tags=["Project Contributors"],
+        request=ContributorSerializer,
+        responses={
+            201: {"description": "Contributor added successfully"},
+            400: {"description": "Bad request - user_id missing or user already a contributor"},
+        },
     )
     @action(detail=True, methods=["get", "post"], url_path="contributors")
     def contributors(self, request, pk=None):
@@ -78,9 +85,9 @@ class ProjectModelViewSet(ModelViewSet):
 
     def _add_contributor(self, project, request):
         """Private method to handle POST logic"""
-        user_id = request.data.get("user_id")
-        if not user_id:
-            return Response({"error": "user_id is required"}, status=400)
+        serializer = ContributorSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user_id = serializer.validated_data["user_id"]
 
         user = get_object_or_404(User, pk=user_id)
 
@@ -95,6 +102,15 @@ class ProjectModelViewSet(ModelViewSet):
         summary="Pop a contributor to a Project",
         description="Remove a user from this Project's contributor.",
         tags=["Project Contributors"],
+        parameters=[
+            OpenApiParameter(
+                name="user_id",
+                type=OpenApiTypes.INT,
+                location="path",
+                description="ID of the user to remove from contributors",
+                required=True,
+            )
+        ],
     )
     @action(detail=True, methods=["delete"], url_path="contributors/(?P<user_id>[^/.]+)")
     def remove_contributor(self, request, pk=None, user_id=None):
