@@ -1,7 +1,8 @@
-from django.urls import path, include
+from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
 from . import views
+
 
 # ** PROJECT MANAGEMENT **
 #     - enpoints:
@@ -19,8 +20,8 @@ from . import views
 
 app_name = "project"
 router = DefaultRouter()
-router.register(r'', views.ProjectModelViewSet, basename='project')
+router.register(r"", views.ProjectModelViewSet, basename="project")
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path("", include(router.urls)),
 ]
