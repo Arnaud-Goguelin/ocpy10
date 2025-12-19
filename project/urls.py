@@ -19,9 +19,13 @@ from . import views
 #     assigned contributors to project
 
 app_name = "project"
-router = DefaultRouter()
-router.register(r"", views.ProjectModelViewSet, basename="project")
+project_router = DefaultRouter()
+project_router.register(r"", views.ProjectModelViewSet, basename="project")
+
+contributor_router = DefaultRouter()
+contributor_router.register(r"(?P<project_id>\d+)/contributors", views.ContributorModelViewSet, basename="contributor")
 
 urlpatterns = [
-    path("", include(router.urls)),
+    path("", include(project_router.urls)),
+    path("", include(contributor_router.urls)),
 ]
