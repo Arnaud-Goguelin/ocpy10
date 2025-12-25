@@ -35,7 +35,7 @@ class IssueModelViewSet(ModelViewSet):
     queryset = Issue.objects.all()
     serializer_class = IssueSerializer
     permission_classes = []
-    
+
     def get_queryset(self):
         """Filter issues by project_id from URL"""
         project_id = self.kwargs.get('project_id')
@@ -80,3 +80,16 @@ class CommentModelViewSet(ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = []
+
+    def get_queryset(self):
+        """Filter issues by issue_id from URL"""
+        issue_id = self.kwargs.get('issue_id')
+        return Comment.objects.filter(issue_id=issue_id)
+
+    def perform_create(self, serializer):
+        """Automatically set author and issue when creating a comment"""
+        issue_id = self.kwargs.get('issue_id')
+        serializer.save(
+            author=self.request.user,
+            issue_id=issue_id
+        )
