@@ -1,4 +1,5 @@
 from drf_spectacular.utils import extend_schema, extend_schema_view
+from jsonschema import ValidationError
 from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
@@ -34,7 +35,7 @@ class SignupView(CreateAPIView):
         tags=["User"],
     ),
     patch=extend_schema(
-        summary="Update one or plus user's profile fields",
+        summary="Update one or many user's profile fields",
         tags=["User"],
     ),
     delete=extend_schema(
@@ -64,3 +65,13 @@ class UserProfileView(RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated, IsUserSelf]
+
+    def perform_destroy(self, instance: "User"):
+        # delete() handles the HTTP request/response logic,
+        # while perform_destroy() is specifically meant for the database deletion logic.
+        if instance.projects.exists():
+            raise ValidationError(
+                "You cannot delete your account while you are the author of active projects."
+                "Please transfer ownership of your projects first."
+            )
+        instance.delete()

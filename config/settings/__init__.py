@@ -1,15 +1,15 @@
 import os
 import sys
 
-from ..constants import Environnement
+from ..constants import Environment
 
-environment = os.environ.get('ENVIRONNEMENT', Environnement.local.value)
+environment = os.environ.get('ENVIRONMENT', Environment.local.value)
 # use print and not logging in this file as it is executed before logging is configured
-if environment == Environnement.production.value:
+if environment == Environment.production.value:
     print("⚠️  Production environment is not configured yet. Application is only available in local environment.", file=sys.stderr)
     sys.exit(1)
     # from .prod import *
-elif environment == Environnement.test.value:
+elif environment == Environment.test.value:
     print("⚠️  Test environment is not configured yet. Application is only available in local environment.",
           file=sys.stderr)
     sys.exit(1)
