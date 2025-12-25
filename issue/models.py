@@ -1,1 +1,37 @@
-# Create your models here.
+import logging
+
+from django.conf import settings
+from django.db import models
+
+from project.models import Project
+
+
+logger = logging.getLogger("issues")
+
+
+class Issue(models.Model):
+    class Status(models.TextChoices):
+        todo = "todo", "To Do"
+        in_progress = "in_progress", "In Progress"
+        closed = "closed", "Closed"
+
+    class Priority(models.TextChoices):
+        low = "low", "Low"
+        medium = "medium", "Medium"
+        high = "high", "High"
+        urgent = "urgent", "Urgent"
+
+    class Tags(models.TextChoices):
+        bug = "bug", "Bug"
+        feature = "feature", "Feature"
+        improvement = "improvement", "Improvement"
+
+    author = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    project = models.ForeignKey(to=Project, on_delete=models.CASCADE, related_name="issues")
+    assigned_users = models.ManyToManyField(to=settings.AUTH_USER_MODEL, related_name="assigned_issues")
+    title = models.CharField(max_length=255)
+    content = models.TextField(blank=True)
+    status = models.CharField(choices=Status, default=Status.todo)
+    priority = models.CharField(choices=Priority, default=Priority.low)
+    tags = models.CharField(choices=Tags, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
