@@ -77,6 +77,7 @@ class UserProfileView(RetrieveUpdateDestroyAPIView):
         instance.delete()
 
 
+# TODO: response in .csv not in JSON GET/profile/{id} already return JSON
 @extend_schema(
     summary="Export user's personal data (GDPR)",
     description="Returns all personal data associated with the user account in JSON format. "

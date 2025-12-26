@@ -36,11 +36,14 @@ class IssueModelViewSet(ModelViewSet):
     serializer_class = IssueSerializer
     permission_classes = []
 
+    # TODO: create a mixin to set project in e new attribute in request
     def get_queryset(self):
         """Filter issues by project_id from URL"""
         project_id = self.kwargs.get("project_id")
         return Issue.objects.filter(project_id=project_id)
 
+    # TODO: do not overwrite perform_create from ModelViewSet
+    #  pass author and project_id in serializer
     def perform_create(self, serializer):
         """Automatically set author and project when creating an issue"""
         project_id = self.kwargs.get("project_id")
@@ -78,11 +81,15 @@ class CommentModelViewSet(ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = []
 
+    # TODO: create a initial method in this viewset to set issue in e new attribute in request
+    #  as comments depends on issue, no other endpoint will use a mixin
     def get_queryset(self):
         """Filter issues by issue_id from URL"""
         issue_id = self.kwargs.get("issue_id")
         return Comment.objects.filter(issue_id=issue_id)
 
+    # TODO: do not overwrite perform_create from ModelViewSet
+    #  pass author and issue_id in serializer
     def perform_create(self, serializer):
         """Automatically set author and issue when creating a comment"""
         issue_id = self.kwargs.get("issue_id")
