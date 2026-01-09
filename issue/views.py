@@ -1,8 +1,10 @@
 from drf_spectacular.utils import extend_schema, extend_schema_view
+from rest_framework.exceptions import NotFound
 from rest_framework.viewsets import ModelViewSet
 
 from .models import Comment, Issue
 from .serializers import CommentSerializer, IssueSerializer
+from .mixins import ProjectScopedMixin
 
 
 @extend_schema_view(
@@ -31,23 +33,10 @@ from .serializers import CommentSerializer, IssueSerializer
         tags=["Issue"],
     ),
 )
-class IssueModelViewSet(ModelViewSet):
+class IssueModelViewSet(ProjectScopedMixin, ModelViewSet):
     queryset = Issue.objects.all()
     serializer_class = IssueSerializer
     permission_classes = []
-
-    # TODO: create a mixin to set project in e new attribute in request
-    def get_queryset(self):
-        """Filter issues by project_id from URL"""
-        project_id = self.kwargs.get("project_id")
-        return Issue.objects.filter(project_id=project_id)
-
-    # TODO: do not overwrite perform_create from ModelViewSet
-    #  pass author and project_id in serializer
-    def perform_create(self, serializer):
-        """Automatically set author and project when creating an issue"""
-        project_id = self.kwargs.get("project_id")
-        serializer.save(author=self.request.user, project_id=project_id)
 
 
 @extend_schema_view(
@@ -81,16 +70,31 @@ class CommentModelViewSet(ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = []
 
-    # TODO: create a initial method in this viewset to set issue in e new attribute in request
-    #  as comments depends on issue, no other endpoint will use a mixin
-    def get_queryset(self):
-        """Filter issues by issue_id from URL"""
-        issue_id = self.kwargs.get("issue_id")
-        return Comment.objects.filter(issue_id=issue_id)
+    def initial(self, request, *args, **kwargs):
+        """
+        Set issue from URL as an instance attribute.
+        Called before every action (list, create, retrieve, etc.)
+        """
+        super().initial(request, *args, **kwargs)
 
-    # TODO: do not overwrite perform_create from ModelViewSet
-    #  pass author and issue_id in serializer
-    def perform_create(self, serializer):
-        """Automatically set author and issue when creating a comment"""
+        # Get and validate issue_id from URL
         issue_id = self.kwargs.get("issue_id")
-        serializer.save(author=self.request.user, issue_id=issue_id)
+        if issue_id:
+            try:
+                self.issue = Issue.objects.get(id=issue_id)
+            except Issue.DoesNotExist:
+                raise NotFound(f"Issue with id {issue_id} does not exist.")
+        else:
+            self.issue = None
+
+    def get_queryset(self):
+        """Filter comments by issue"""
+        if self.issue:
+            return Comment.objects.filter(issue=self.issue)
+        return Comment.objects.none()
+
+    def get_serializer_context(self):
+        """Add issue to serializer context"""
+        context = super().get_serializer_context()
+        context['issue'] = self.issue
+        return context
