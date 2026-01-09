@@ -14,7 +14,6 @@ class Contributor(models.Model):
         admin = "admin", "Admin"
         contributor = "contributor", "Contributor"
 
-    # TODO: on_delete=models.CASCADE ??? pas on_delete=models.Contributor
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     project = models.ForeignKey("project.Project", on_delete=models.CASCADE)
     role = models.CharField(choices=ContributorRoles)
