@@ -8,6 +8,10 @@ class ProjectSerializer(ModelSerializer):
         model = Project
         fields = ["name", "type", "description", "author", "contributors", "created_at"]
 
+    def create(self, validated_data):
+        """Automatically set author from context"""
+        validated_data["author"] = self.context["request"].user
+        return super().create(validated_data)
 
 class ContributorSerializer(Serializer):
     """Serializer for adding a contributor to a project"""
