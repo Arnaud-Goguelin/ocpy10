@@ -1,11 +1,13 @@
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.exceptions import NotFound
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
 from .mixins import ProjectScopedMixin
 from .models import Comment, Issue
 from .serializers import CommentSerializer, IssueSerializer
-
+from ..project.permissions import IsContributor
+from ..config.global_permissions import IsAuthor
 
 @extend_schema_view(
     list=extend_schema(
@@ -36,7 +38,7 @@ from .serializers import CommentSerializer, IssueSerializer
 class IssueModelViewSet(ProjectScopedMixin, ModelViewSet):
     queryset = Issue.objects.all()
     serializer_class = IssueSerializer
-    permission_classes = []
+    permission_classes = [IsAuthenticated, IsAuthor | IsContributor]
 
 
 @extend_schema_view(
@@ -68,7 +70,7 @@ class IssueModelViewSet(ProjectScopedMixin, ModelViewSet):
 class CommentModelViewSet(ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
-    permission_classes = []
+    permission_classes = [IsAuthenticated, IsAuthor | IsContributor]
 
     def initial(self, request, *args, **kwargs):
         """
