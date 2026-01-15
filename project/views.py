@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
 from config.docs import DocsTypingParameters
+from config.mixins import ProjectMixin
 from project.models import Contributor, Project
 
 from config.global_permissions import IsAuthor
@@ -77,9 +78,9 @@ class ProjectModelViewSet(ModelViewSet):
         tags=["Project-Contributor"],
     ),
 )
-class ContributorModelViewSet(ModelViewSet):
+class ContributorModelViewSet(ProjectMixin, ModelViewSet):
     serializer_class = ContributorSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Contributor.objects.filter(project_id=self.kwargs.get("project_id"))
+        return Contributor.objects.filter(project=self.project)

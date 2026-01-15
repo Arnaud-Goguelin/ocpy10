@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
 from config.docs import DocsTypingParameters
+from config.mixins import ProjectMixin
 from project.models import Project
 from config.global_permissions import IsAuthor
 from project.permissions import IsContributor
@@ -46,18 +47,15 @@ from .serializers import CommentSerializer, IssueSerializer
         parameters=[DocsTypingParameters.project_id.value, DocsTypingParameters.issue_id.value],
     ),
 )
-class IssueModelViewSet(ModelViewSet):
+class IssueModelViewSet(ProjectMixin, ModelViewSet):
     serializer_class = IssueSerializer
     permission_classes = [IsAuthenticated, IsAuthor | IsContributor]
-
-    def initial(self, request, *args, **kwargs):
-        self.project =Project.object.get(id=self.kwargs.get("project_id"))
-        super().initial(request, *args, **kwargs)
 
     def get_queryset(self):
         """Filter by project_id from URL"""
         return Issue.objects.filter(project=self.project)
 
+    # TODO: do we need project_id in serializer as we have project in view?
     def get_serializer_context(self):
         """Add project_id to serializer context"""
         context = super().get_serializer_context()
@@ -101,7 +99,7 @@ class IssueModelViewSet(ModelViewSet):
                     DocsTypingParameters.comment_id.value],
     ),
 )
-class CommentModelViewSet(ModelViewSet):
+class CommentModelViewSet(ProjectMixin, ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticated, IsAuthor | IsContributor]
 
@@ -114,11 +112,9 @@ class CommentModelViewSet(ModelViewSet):
 
         # Get and validate issue_id from URL
         issue_id = self.kwargs.get("issue_id")
-        project_id = self.kwargs.get("project_id")
         try:
-            # do not forget to filter by project_id, to ensure issue is part of the project
-            self.issue = Issue.objects.get(id=issue_id, project_id=project_id)
-            self.project = self.issue.project
+            # do not forget to filter by project, to ensure the issue is part of the current project
+            self.issue = Issue.objects.get(id=issue_id, project=self.project)
         except Issue.DoesNotExist as error:
             raise NotFound(f"Issue with id {issue_id} does not exist.") from error
 
