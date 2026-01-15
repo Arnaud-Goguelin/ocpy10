@@ -29,6 +29,7 @@ dev = [
     "pytest>=9.0.2",
     "pytest-cov>=7.0.0",
     "pytest-django>=4.11.1",
+    "pytest-mock>=3.15.1",
     "ruff ~= 0.12.4",
 ]
 #===========================
@@ -93,3 +94,14 @@ known-first-party = ["src"]
 force-single-line = false
 lines-between-types = 1
 lines-after-imports = 2
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.local"
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--strict-markers",
+    "--tb=short",
+]
