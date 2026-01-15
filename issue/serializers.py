@@ -1,12 +1,14 @@
+from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import ModelSerializer
 
+from user.models import User
 from .models import Comment, Issue
 
 
 class IssueSerializer(ModelSerializer):
     class Meta:
         model = Issue
-        fields = ["title", "content", "status", "priority", "tags", "created_at", "project", "author", "assigned_users"]
+        fields = ["title", "content", "status", "priority", "tags", "created_at", "project", "author"]
         read_only_fields = ["author", "project", "created_at"]
 
     def create(self, validated_data):
