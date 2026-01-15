@@ -10,7 +10,6 @@ logger = logging.getLogger("projects")
 
 
 class Contributor(models.Model):
-
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     project = models.ForeignKey("project.Project", on_delete=models.CASCADE)
 

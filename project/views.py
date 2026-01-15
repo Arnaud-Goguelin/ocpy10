@@ -1,16 +1,16 @@
 from django.db.models import Q
-from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
 from config.docs import DocsTypingParameters
+from config.global_permissions import IsAuthor
 from config.mixins import ProjectMixin
 from project.models import Contributor, Project
 
-from config.global_permissions import IsAuthor
 from .permissions import IsContributor
 from .serializers import ContributorSerializer, ProjectSerializer
+
 
 @extend_schema_view(
     list=extend_schema(

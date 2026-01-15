@@ -8,6 +8,7 @@ class ProjectMixin:
     Mixin to automatically fetch and set the project from URL kwargs.
     Sets self.project for use in permissions and queryset filtering.
     """
+
     project = None
 
     def initial(self, request, *args, **kwargs):

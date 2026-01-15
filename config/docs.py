@@ -7,22 +7,13 @@ from drf_spectacular.utils import OpenApiParameter
 
 class DocsTypingParameters(Enum):
     project_id = OpenApiParameter(
-                    name='id',
-                    type=OpenApiTypes.INT,
-                    location=OpenApiParameter.PATH,
-                    description='Project ID'
-                )
+        name="id", type=OpenApiTypes.INT, location=OpenApiParameter.PATH, description="Project ID"
+    )
 
     issue_id = OpenApiParameter(
-                    name='id',
-                    type=OpenApiTypes.INT,
-                    location=OpenApiParameter.PATH,
-                    description='Issue ID'
-                )
+        name="id", type=OpenApiTypes.INT, location=OpenApiParameter.PATH, description="Issue ID"
+    )
 
     comment_id = OpenApiParameter(
-                    name='id',
-                    type=OpenApiTypes.INT,
-                    location=OpenApiParameter.PATH,
-                    description='Comment ID'
-                )
+        name="id", type=OpenApiTypes.INT, location=OpenApiParameter.PATH, description="Comment ID"
+    )

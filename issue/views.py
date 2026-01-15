@@ -1,18 +1,15 @@
-from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
 from config.docs import DocsTypingParameters
-from config.mixins import ProjectMixin
-from project.models import Project
 from config.global_permissions import IsAuthor
+from config.mixins import ProjectMixin
 from project.permissions import IsContributor
+
 from .models import Comment, Issue
 from .serializers import CommentSerializer, IssueSerializer
-
-
 
 
 @extend_schema_view(
@@ -65,8 +62,11 @@ class IssueModelViewSet(ProjectMixin, ModelViewSet):
     retrieve=extend_schema(
         summary="Get an Comment",
         tags=["Comment"],
-        parameters=[DocsTypingParameters.project_id.value, DocsTypingParameters.issue_id.value,
-                    DocsTypingParameters.comment_id.value],
+        parameters=[
+            DocsTypingParameters.project_id.value,
+            DocsTypingParameters.issue_id.value,
+            DocsTypingParameters.comment_id.value,
+        ],
     ),
     create=extend_schema(
         summary="Create an Comment",
@@ -76,20 +76,29 @@ class IssueModelViewSet(ProjectMixin, ModelViewSet):
     update=extend_schema(
         summary="Update entirely an Comment",
         tags=["Comment"],
-        parameters=[DocsTypingParameters.project_id.value, DocsTypingParameters.issue_id.value,
-                    DocsTypingParameters.comment_id.value],
+        parameters=[
+            DocsTypingParameters.project_id.value,
+            DocsTypingParameters.issue_id.value,
+            DocsTypingParameters.comment_id.value,
+        ],
     ),
     partial_update=extend_schema(
         summary="Update one or many Comment's fields",
         tags=["Comment"],
-        parameters=[DocsTypingParameters.project_id.value, DocsTypingParameters.issue_id.value,
-                    DocsTypingParameters.comment_id.value],
+        parameters=[
+            DocsTypingParameters.project_id.value,
+            DocsTypingParameters.issue_id.value,
+            DocsTypingParameters.comment_id.value,
+        ],
     ),
     destroy=extend_schema(
         summary="Delete an Comment",
         tags=["Comment"],
-        parameters=[DocsTypingParameters.project_id.value, DocsTypingParameters.issue_id.value,
-                    DocsTypingParameters.comment_id.value],
+        parameters=[
+            DocsTypingParameters.project_id.value,
+            DocsTypingParameters.issue_id.value,
+            DocsTypingParameters.comment_id.value,
+        ],
     ),
 )
 class CommentModelViewSet(ProjectMixin, ModelViewSet):
