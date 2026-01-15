@@ -210,3 +210,4 @@ __marimo__/
 .idea/
 TODO
 ToDo.txt
+requests.http
