@@ -6,13 +6,13 @@ from .models import Comment, Issue
 class IssueSerializer(ModelSerializer):
     class Meta:
         model = Issue
-        fields = ["title", "content", "status", "priority", "tags", "created_at", "project", "author", "assigned_users"]
+        fields = ["title", "content", "status", "priority", "tags", "created_at", "project", "author"]
         read_only_fields = ["author", "project", "created_at"]
 
     def create(self, validated_data):
         """Automatically set author and project from context"""
         validated_data["author"] = self.context["request"].user
-        validated_data["project_id"] = self.context["project_id"]
+        validated_data["project"] = self.context["view"].project
         return super().create(validated_data)
 
 

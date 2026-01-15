@@ -3,9 +3,11 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
+from config.docs import DocsTypingParameters
+from config.global_permissions import IsAuthor
+from config.mixins import ProjectMixin
 from project.models import Contributor, Project
 
-from ..config.global_permissions import IsAuthor
 from .permissions import IsContributor
 from .serializers import ContributorSerializer, ProjectSerializer
 
@@ -14,10 +16,12 @@ from .serializers import ContributorSerializer, ProjectSerializer
     list=extend_schema(
         summary="Get all Projects",
         tags=["Project"],
+        parameters=[DocsTypingParameters.project_id.value],
     ),
     retrieve=extend_schema(
         summary="Get a Project",
         tags=["Project"],
+        parameters=[DocsTypingParameters.project_id.value],
     ),
     create=extend_schema(
         summary="Create a Project",
@@ -26,18 +30,20 @@ from .serializers import ContributorSerializer, ProjectSerializer
     update=extend_schema(
         summary="Update entirely a Project",
         tags=["Project"],
+        parameters=[DocsTypingParameters.project_id.value],
     ),
     partial_update=extend_schema(
         summary="Update one or many Project's fields",
         tags=["Project"],
+        parameters=[DocsTypingParameters.project_id.value],
     ),
     destroy=extend_schema(
         summary="Delete Project",
         tags=["Project"],
+        parameters=[DocsTypingParameters.project_id.value],
     ),
 )
 class ProjectModelViewSet(ModelViewSet):
-    queryset = Project.objects.all()
     serializer_class = ProjectSerializer
     permission_classes = [IsAuthenticated, IsAuthor | IsContributor]
 
@@ -72,7 +78,9 @@ class ProjectModelViewSet(ModelViewSet):
         tags=["Project-Contributor"],
     ),
 )
-class ContributorModelViewSet(ModelViewSet):
-    queryset = Contributor.objects.all()
+class ContributorModelViewSet(ProjectMixin, ModelViewSet):
     serializer_class = ContributorSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Contributor.objects.filter(project=self.project)

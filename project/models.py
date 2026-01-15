@@ -10,14 +10,8 @@ logger = logging.getLogger("projects")
 
 
 class Contributor(models.Model):
-    class ContributorRoles(models.TextChoices):
-        admin = "admin", "Admin"
-        contributor = "contributor", "Contributor"
-
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     project = models.ForeignKey("project.Project", on_delete=models.CASCADE)
-    role = models.CharField(choices=ContributorRoles)
-    pass
 
 
 class Project(models.Model):

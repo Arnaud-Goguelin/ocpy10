@@ -14,13 +14,7 @@ class IsContributor(permissions.BasePermission):
             return False
 
         # define project depending of obj type (Project or Issue, Comment, etc.)
-        if isinstance(obj, Project):
-            project = obj
-        elif hasattr(obj, "project"):
-            # For Issue, Comment, etc.
-            project = obj.project
-        else:
-            return False
+        project = obj if isinstance(obj, Project) else view.project
 
         # Check if user is a contributor of the project
         return project.contributors.filter(id=request.user.id).exists()

@@ -3,9 +3,11 @@ from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
-from ..config.global_permissions import IsAuthor
-from ..project.permissions import IsContributor
-from .mixins import ProjectScopedMixin
+from config.docs import DocsTypingParameters
+from config.global_permissions import IsAuthor
+from config.mixins import ProjectMixin
+from project.permissions import IsContributor
+
 from .models import Comment, Issue
 from .serializers import CommentSerializer, IssueSerializer
 
@@ -14,62 +16,92 @@ from .serializers import CommentSerializer, IssueSerializer
     list=extend_schema(
         summary="Get all Issues",
         tags=["Issue"],
+        parameters=[DocsTypingParameters.project_id.value, DocsTypingParameters.issue_id.value],
     ),
     retrieve=extend_schema(
         summary="Get an Issue",
         tags=["Issue"],
+        parameters=[DocsTypingParameters.project_id.value, DocsTypingParameters.issue_id.value],
     ),
     create=extend_schema(
         summary="Create an Issue",
         tags=["Issue"],
+        parameters=[DocsTypingParameters.project_id.value],
     ),
     update=extend_schema(
         summary="Update entirely an Issue",
         tags=["Issue"],
+        parameters=[DocsTypingParameters.project_id.value, DocsTypingParameters.issue_id.value],
     ),
     partial_update=extend_schema(
         summary="Update one or many Issue's fields",
         tags=["Issue"],
+        parameters=[DocsTypingParameters.project_id.value, DocsTypingParameters.issue_id.value],
     ),
     destroy=extend_schema(
         summary="Delete an Issue",
         tags=["Issue"],
+        parameters=[DocsTypingParameters.project_id.value, DocsTypingParameters.issue_id.value],
     ),
 )
-class IssueModelViewSet(ProjectScopedMixin, ModelViewSet):
-    queryset = Issue.objects.all()
+class IssueModelViewSet(ProjectMixin, ModelViewSet):
     serializer_class = IssueSerializer
     permission_classes = [IsAuthenticated, IsAuthor | IsContributor]
+
+    def get_queryset(self):
+        """Filter by project_id from URL"""
+        return Issue.objects.filter(project=self.project)
 
 
 @extend_schema_view(
     list=extend_schema(
         summary="Get all Comments",
         tags=["Comment"],
+        parameters=[DocsTypingParameters.project_id.value, DocsTypingParameters.issue_id.value],
     ),
     retrieve=extend_schema(
         summary="Get an Comment",
         tags=["Comment"],
+        parameters=[
+            DocsTypingParameters.project_id.value,
+            DocsTypingParameters.issue_id.value,
+            DocsTypingParameters.comment_id.value,
+        ],
     ),
     create=extend_schema(
         summary="Create an Comment",
         tags=["Comment"],
+        parameters=[DocsTypingParameters.project_id.value, DocsTypingParameters.issue_id.value],
     ),
     update=extend_schema(
         summary="Update entirely an Comment",
         tags=["Comment"],
+        parameters=[
+            DocsTypingParameters.project_id.value,
+            DocsTypingParameters.issue_id.value,
+            DocsTypingParameters.comment_id.value,
+        ],
     ),
     partial_update=extend_schema(
         summary="Update one or many Comment's fields",
         tags=["Comment"],
+        parameters=[
+            DocsTypingParameters.project_id.value,
+            DocsTypingParameters.issue_id.value,
+            DocsTypingParameters.comment_id.value,
+        ],
     ),
     destroy=extend_schema(
         summary="Delete an Comment",
         tags=["Comment"],
+        parameters=[
+            DocsTypingParameters.project_id.value,
+            DocsTypingParameters.issue_id.value,
+            DocsTypingParameters.comment_id.value,
+        ],
     ),
 )
-class CommentModelViewSet(ModelViewSet):
-    queryset = Comment.objects.all()
+class CommentModelViewSet(ProjectMixin, ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticated, IsAuthor | IsContributor]
 
@@ -82,19 +114,15 @@ class CommentModelViewSet(ModelViewSet):
 
         # Get and validate issue_id from URL
         issue_id = self.kwargs.get("issue_id")
-        if issue_id:
-            try:
-                self.issue = Issue.objects.get(id=issue_id)
-            except Issue.DoesNotExist as error:
-                raise NotFound(f"Issue with id {issue_id} does not exist.") from error
-        else:
-            self.issue = None
+        try:
+            # do not forget to filter by project, to ensure the issue is part of the current project
+            self.issue = Issue.objects.get(id=issue_id, project=self.project)
+        except Issue.DoesNotExist as error:
+            raise NotFound(f"Issue with id {issue_id} does not exist.") from error
 
     def get_queryset(self):
         """Filter comments by issue"""
-        if self.issue:
-            return Comment.objects.filter(issue=self.issue)
-        return Comment.objects.none()
+        return Comment.objects.filter(issue=self.issue)
 
     def get_serializer_context(self):
         """Add issue to serializer context"""
