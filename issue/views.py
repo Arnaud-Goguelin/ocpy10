@@ -55,13 +55,6 @@ class IssueModelViewSet(ProjectMixin, ModelViewSet):
         """Filter by project_id from URL"""
         return Issue.objects.filter(project=self.project)
 
-    # TODO: do we need project_id in serializer as we have project in view?
-    def get_serializer_context(self):
-        """Add project_id to serializer context"""
-        context = super().get_serializer_context()
-        context["project_id"] = self.kwargs.get("project_id")
-        return context
-
 
 @extend_schema_view(
     list=extend_schema(
