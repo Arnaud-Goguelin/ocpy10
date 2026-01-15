@@ -19,6 +19,13 @@ class UserSerializer(serializers.ModelSerializer):
         ]
 
     @staticmethod
+    def get_age(obj: User) -> int | None:
+        """Calculate age from date of birth"""
+        if obj.date_of_birth:
+            return User.calculate_age(obj.date_of_birth)
+        return None
+
+    @staticmethod
     def validate_date_of_birth(value: datetime) -> datetime:
         """Ensure date of birth is not in the future"""
         # reminder, with DRF a method name validate_{field_name} is automatically called
