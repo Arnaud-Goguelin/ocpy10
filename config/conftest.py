@@ -19,6 +19,7 @@ def api_client():
 @pytest.fixture
 def user_factory(db):
     """Factory to create multiple users"""
+
     def make_user(**kwargs):
         defaults = {
             "username": fake.user_name(),
@@ -33,6 +34,7 @@ def user_factory(db):
         # attach plain password to user for easy access in test
         user.plain_password = password
         return user
+
     return make_user
 
 

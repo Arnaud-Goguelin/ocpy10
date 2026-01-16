@@ -7,7 +7,7 @@ from .models import User
 
 class UserSerializer(serializers.ModelSerializer):
     age = serializers.SerializerMethodField(read_only=True)
-    password = serializers.CharField(write_only=True, required=False, style={'input_type': 'password'})
+    password = serializers.CharField(write_only=True, required=False, style={"input_type": "password"})
 
     class Meta:
         model = User
@@ -19,7 +19,6 @@ class UserSerializer(serializers.ModelSerializer):
             "consent",
             "age",
         ]
-
 
     @staticmethod
     def get_age(obj: User) -> int | None:
@@ -56,7 +55,6 @@ class UserSerializer(serializers.ModelSerializer):
 
             if age < 15 or "consent" not in validated_data:
                 validated_data["consent"] = False
-
 
         return User.objects.create_user(password=password, **validated_data)
 

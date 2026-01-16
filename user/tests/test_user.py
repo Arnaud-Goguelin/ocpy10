@@ -4,7 +4,8 @@ import pytest
 
 from django.urls import reverse
 from rest_framework import status
-from config.conftest import fake, User, api_client, authenticated_client, user_factory, create_user
+
+from config.conftest import User, fake
 
 
 base_user_url = "user:"
@@ -163,7 +164,7 @@ class TestUserProfileViewPatch:
             "date_of_birth": self._get_date_of_birth_for_age(13),
             # User tries to keep consent, but should be forced to False
             "consent": True,
-            }
+        }
 
         response = authenticated_client.patch(url, data, format="json")
 
@@ -178,7 +179,7 @@ class TestUserProfileViewPatch:
         data = {
             "date_of_birth": self._get_date_of_birth_for_age(16),
             "consent": True,
-            }
+        }
 
         response = authenticated_client.patch(url, data, format="json")
 
