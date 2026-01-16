@@ -5,7 +5,7 @@ import pytest
 from django.urls import reverse
 from rest_framework import status
 
-from config.conftest import User, fake
+from config.conftest import User, fake, api_client, authenticated_client, UserFactory
 
 
 base_user_url = "user:"
@@ -68,9 +68,9 @@ class TestUserProfileViewGet:
         assert "password" not in response.data
         assert "id" not in response.data
 
-    def test_get_profile_other_user_failure(self, authenticated_client, user_factory):
+    def test_get_profile_other_user_failure(self, authenticated_client):
         """Failure: Cannot get another user's profile"""
-        other_user = user_factory()
+        other_user = UserFactory()
         url = reverse(f"{base_user_url}profile", kwargs={"pk": other_user.pk})
 
         response = authenticated_client.get(url)
@@ -100,9 +100,9 @@ class TestUserProfileViewPut:
         assert response.data["email"] == data["email"]
         assert response.data["date_of_birth"] == data["date_of_birth"]
 
-    def test_put_profile_failure_other_user(self, authenticated_client, user_factory):
+    def test_put_profile_failure_other_user(self, authenticated_client):
         """Failure: Cannot update another user's profile"""
-        other_user = user_factory()
+        other_user = UserFactory()
         url = reverse(f"{base_user_url}profile", kwargs={"pk": other_user.pk})
         data = {
             "username": fake.user_name(),
@@ -146,9 +146,10 @@ class TestUserProfileViewPatch:
         # Other fields should remain unchanged
         assert response.data["username"] == authenticated_client.user.username
 
-    def test_patch_profile_failure_unauthenticated(self, api_client, create_user):
+    def test_patch_profile_failure_unauthenticated(self, api_client):
         """Failure: Unauthenticated user cannot update profile"""
-        url = reverse(f"{base_user_url}profile", kwargs={"pk": create_user.pk})
+        test_user = UserFactory()
+        url = reverse(f"{base_user_url}profile", kwargs={"pk": test_user.pk})
         data = {
             "email": fake.email(),
         }
@@ -204,10 +205,10 @@ class TestUserProfileViewDelete:
         # Verify user is actually deleted
         assert not User.objects.filter(pk=user_id).exists()
 
-    def test_delete_profile_other_user_failure(self, authenticated_client, user_factory):
+    def test_delete_profile_other_user_failure(self, authenticated_client):
         """Failure: Cannot delete another user's account"""
 
-        other_user = user_factory()
+        other_user = UserFactory()
         url = reverse(f"{base_user_url}profile", kwargs={"pk": other_user.pk})
 
         response = authenticated_client.delete(url)
@@ -234,9 +235,9 @@ class TestGDPRExportView:
         assert authenticated_client.user.username in content
         assert authenticated_client.user.email in content
 
-    def test_gdpr_export_other_user_failure(self, authenticated_client, user_factory):
+    def test_gdpr_export_other_user_failure(self, authenticated_client):
         """Failure: Cannot export another user's data"""
-        other_user = user_factory()
+        other_user = UserFactory()
         url = reverse(f"{base_user_url}gdpr-export", kwargs={"pk": other_user.pk})
 
         response = authenticated_client.get(url)
