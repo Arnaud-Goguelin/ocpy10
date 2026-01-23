@@ -4,11 +4,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
 from config.docs import DocsTypingParameters
-from config.global_permissions import IsAuthor
+from config.global_permissions import IsObjectAuthor
 from config.mixins import ProjectMixin
 from project.models import Contributor, Project
 
-from .permissions import IsContributor
+from .permissions import WriteContributor
 from .serializers import ContributorSerializer, ProjectSerializer
 
 
@@ -45,7 +45,7 @@ from .serializers import ContributorSerializer, ProjectSerializer
 )
 class ProjectModelViewSet(ModelViewSet):
     serializer_class = ProjectSerializer
-    permission_classes = [IsAuthenticated, IsAuthor | IsContributor]
+    permission_classes = [IsAuthenticated, IsObjectAuthor]
 
     def get_queryset(self):
         user = self.request.user
@@ -85,7 +85,17 @@ class ProjectModelViewSet(ModelViewSet):
 )
 class ContributorModelViewSet(ProjectMixin, ModelViewSet):
     serializer_class = ContributorSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, WriteContributor]
 
     def get_queryset(self):
-        return Contributor.objects.select_related("project", "user").filter(project=self.project)
+        user = self.request.user
+
+        return (
+            Contributor.objects.select_related("project", "user")
+            .filter(project=self.project)
+            # object__attribute syntax to go through relationship
+            # project__author = contributor.project.author
+            .filter(Q(project__author=user) | Q(project__contributors=user))
+            # avoid duplicates
+            .distinct()
+        )
