@@ -1,12 +1,12 @@
+from django.db.models import Q
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
 from config.docs import DocsTypingParameters
-from config.global_permissions import IsObjectAuthor
+from config.global_permissions import IsObjectAuthor, IsProjectContributor
 from config.mixins import ProjectMixin
-from project.permissions import ContributorReadOnly
 
 from .models import Comment, Issue
 from .serializers import CommentSerializer, IssueSerializer
@@ -46,11 +46,19 @@ from .serializers import CommentSerializer, IssueSerializer
 )
 class IssueModelViewSet(ProjectMixin, ModelViewSet):
     serializer_class = IssueSerializer
-    permission_classes = [IsAuthenticated, IsObjectAuthor | ContributorReadOnly]
+    permission_classes = [IsAuthenticated, IsObjectAuthor, IsProjectContributor]
 
     def get_queryset(self):
         """Filter by project_id from URL"""
-        return Issue.objects.select_related("project", "author").filter(project=self.project)
+        return (
+            Issue.objects.select_related("project", "author")
+            .filter(project=self.project)
+            # object__attribute syntax to go through relationship
+            # project__author = contributor.project.author
+            .filter(Q(project__author=self.request.user) | Q(project__contributors=self.request.user))
+            # avoid duplicates
+            .distinct()
+        )
 
 
 @extend_schema_view(
@@ -103,12 +111,13 @@ class IssueModelViewSet(ProjectMixin, ModelViewSet):
 )
 class CommentModelViewSet(ProjectMixin, ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthenticated, IsObjectAuthor | ContributorReadOnly]
+    permission_classes = [IsAuthenticated, IsObjectAuthor, IsProjectContributor]
 
     def initial(self, request, *args, **kwargs):
         """
         Set issue from URL as an instance attribute.
         Called before every action (list, create, retrieve, etc.)
+        As CommentModelViewSet is the only view to need this, it is useless to create a mixin
         """
         super().initial(request, *args, **kwargs)
 
@@ -122,7 +131,17 @@ class CommentModelViewSet(ProjectMixin, ModelViewSet):
 
     def get_queryset(self):
         """Filter comments by issue"""
-        return Comment.objects.select_related("author", "issue").filter(issue=self.issue)
+        # object__attribute syntax to go through relationship
+        # project__author = contributor.project.author
+        return (
+            (
+                (Comment.objects.select_related("issue", "author").filter(issue=self.issue)).filter(
+                    Q(issue__author=self.request.user) | Q(issue__project__contributors=self.request.user)
+                )
+            )
+            # avoid duplicates
+            .distinct()
+        )
 
     def get_serializer_context(self):
         """Add issue to serializer context"""
