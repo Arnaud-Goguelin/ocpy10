@@ -46,7 +46,7 @@ class TestProjectRetrieve:
 
     def test_retrieve_project_success(self, authenticated_client, create_project):
         """Success: Retrieve a project where user is contributor"""
-        url = reverse(f"{base_project_url}project-detail", kwargs={"pk": create_project.pk})
+        url = reverse(f"{base_project_url}project-detail", kwargs={"project_id": create_project.pk})
 
         response = authenticated_client.get(url)
 
@@ -60,7 +60,7 @@ class TestProjectRetrieve:
         other_author = UserFactory()
         other_project = ProjectFactory(author=other_author)
 
-        url = reverse(f"{base_project_url}project-detail", kwargs={"pk": other_project.pk})
+        url = reverse(f"{base_project_url}project-detail", kwargs={"project_id": other_project.pk})
 
         response = authenticated_client.get(url)
 
@@ -110,7 +110,7 @@ class TestProjectUpdate:
     def test_update_project_success(self, authenticated_client, create_project):
         """Success: Author can update their project"""
         other_author = UserFactory()
-        url = reverse(f"{base_project_url}project-detail", kwargs={"pk": create_project.pk})
+        url = reverse(f"{base_project_url}project-detail", kwargs={"project_id": create_project.pk})
         data = {
             "author": other_author.pk,
             "name": fake.catch_phrase(),
@@ -132,7 +132,7 @@ class TestProjectUpdate:
         # Add authenticated user as contributor
         project.contributors.add(authenticated_client.user)
 
-        url = reverse(f"{base_project_url}project-detail", kwargs={"pk": project.pk})
+        url = reverse(f"{base_project_url}project-detail", kwargs={"project_id": project.pk})
         data = {
             "name": fake.catch_phrase(),
             "description": fake.text(max_nb_chars=200),
@@ -150,7 +150,7 @@ class TestProjectPatch:
 
     def test_patch_project_success(self, authenticated_client, create_project):
         """Success: Author can partially update their project"""
-        url = reverse(f"{base_project_url}project-detail", kwargs={"pk": create_project.pk})
+        url = reverse(f"{base_project_url}project-detail", kwargs={"project_id": create_project.pk})
         data = {
             "name": fake.catch_phrase(),
         }
@@ -169,7 +169,7 @@ class TestProjectPatch:
         project = ProjectFactory(author=other_author)
         project.contributors.add(authenticated_client.user)
 
-        url = reverse(f"{base_project_url}project-detail", kwargs={"pk": project.pk})
+        url = reverse(f"{base_project_url}project-detail", kwargs={"project_id": project.pk})
         data = {
             "name": fake.catch_phrase(),
         }
@@ -186,7 +186,7 @@ class TestProjectDelete:
     def test_delete_project_success(self, authenticated_client, create_project):
         """Success: Author can delete their project"""
         project_id = create_project.pk
-        url = reverse(f"{base_project_url}project-detail", kwargs={"pk": project_id})
+        url = reverse(f"{base_project_url}project-detail", kwargs={"project_id": project_id})
 
         response = authenticated_client.delete(url)
 
@@ -199,7 +199,7 @@ class TestProjectDelete:
         project = ProjectFactory(author=other_author)
         project.contributors.add(authenticated_client.user)
 
-        url = reverse(f"{base_project_url}project-detail", kwargs={"pk": project.pk})
+        url = reverse(f"{base_project_url}project-detail", kwargs={"project_id": project.pk})
 
         response = authenticated_client.delete(url)
 
