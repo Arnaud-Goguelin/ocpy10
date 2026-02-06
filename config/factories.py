@@ -20,9 +20,9 @@ class UserFactory(factory.django.DjangoModelFactory):
     date_of_birth = factory.Faker("date_of_birth", minimum_age=18, maximum_age=80)
     consent = True
 
-
+    # force ruff to ignore followings line: use obj as first arg is a factory convention, whereas ruff expects self
     @factory.post_generation
-    def password(obj, create, extracted, **kwargs):
+    def password(obj, create, extracted, **kwargs):  # noqa: N805
         """Set password properly using set_password() and attach plain password"""
         if not create:
             return
