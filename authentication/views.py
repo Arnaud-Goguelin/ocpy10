@@ -4,6 +4,7 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
@@ -80,9 +81,10 @@ class LogoutView(APIView):
 
             return Response(status=200)
 
+        except TokenError as error:
+            logger.warning(f"Token error during logout: {error}")
+            return Response({"error": str(error)}, status=400)
+
         except Exception as error:
             logger.error(f"Unexpected error during logout: {error}")
-            return Response(
-                str(error),
-                status=400,
-            )
+            return Response({"error": str(error)}, status=500)

@@ -15,6 +15,7 @@ dependencies = [
     "djangorestframework-simplejwt>=5.5.1",
     "djangorestframework-stubs>=3.16.6",
     "drf-spectacular ~= 0.29.0",
+    "factory-boy>=3.3.3",
     "pygments ~= 2.19.2",
     "python-dotenv>=1.2.1",
     "pyyaml ~= 6.0.3",
@@ -25,6 +26,12 @@ readme = "README.md"
 #===========================
 [dependency-groups]
 dev = [
+    "faker>=40.1.2",
+    "ipdb>=0.13.13",
+    "pytest>=9.0.2",
+    "pytest-cov>=7.0.0",
+    "pytest-django>=4.11.1",
+    "pytest-mock>=3.15.1",
     "ruff ~= 0.12.4",
 ]
 #===========================
@@ -89,3 +96,14 @@ known-first-party = ["src"]
 force-single-line = false
 lines-between-types = 1
 lines-after-imports = 2
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.local"
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--strict-markers",
+    "--tb=short",
+]
