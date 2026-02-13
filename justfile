@@ -100,10 +100,11 @@ quick-start: setup run-local
 # === Database Commands ===
 
 # Reset the database (delete and recreate)
+# reset DB under every os where python is installed (everywhere for a django project)
 reset-db:
-    rm -f db.sqlite3
-    python manage.py migrate
-    @echo "✅ Database reset complete!"
+	python -c "import os; os.path.exists('db.sqlite3') and os.remove('db.sqlite3')"
+	python manage.py migrate
+	@echo "✅ Database reset complete!"
 
 # Create a Django superuser
 createsuperuser:
