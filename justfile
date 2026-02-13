@@ -11,17 +11,17 @@ default:
 
 # === Docker Commands ===
 
-# Build and start the application with Docker Compose
+# Build and start the application with Docker Compose (local)
 docker-up:
-    docker compose -f docker/compose.yml up --build
+    docker compose -f docker/compose.local.yml up --build
 
-# Stop the Docker containers
+# Stop the Docker containers (local)
 docker-down:
-    docker compose -f docker/compose.yml down
+    docker compose -f docker/compose.local.yml down
 
-# Stop and remove containers, volumes, and images
+# Stop and remove containers, volumes, and images (local)
 docker-clean:
-    docker compose -f docker/compose.yml down -v --rmi all
+    docker compose -f docker/compose.local.yml down -v --rmi all
 
 # Build Docker image from Dockerfile
 docker-build:
@@ -91,7 +91,7 @@ test-marker MARKER:
 
 # === Combined Commands ===
 
-# Full setup with Docker
+# Full setup with Docker (local)
 docker-setup: docker-clean docker-up
 
 # Quick start for local development
@@ -156,7 +156,7 @@ showmigrations:
 # Open Swagger/OpenAPI documentation (requires local server running)
 docs:
     @echo "📚 Opening API documentation..."
-    @echo "Make sure the server is running with 'just run-local'"
+    @echo "Make sure the server is running with ' '"
     @echo "Documentation available at: http://127.0.0.1:8000/api/docs/swagger/"
 
 # Clean Python cache files

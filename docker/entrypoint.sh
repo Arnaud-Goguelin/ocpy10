@@ -24,5 +24,5 @@ if [ "$ENVIRONMENT" = "local" ]; then
 else
   # use uvicorn as it support natively async request
     echo "Running production server with uvicorn (workers: $WORKERS)..."
-    exec uvicorn ocpy10.asgi:application --host 0.0.0.0 --port 8000 --workers "$WORKERS"
+    exec uvicorn config.asgi:application --host 0.0.0.0 --port 8000 --workers "$WORKERS"
 fi
