@@ -59,7 +59,7 @@ class TestUserProfileViewGet:
 
     def test_get_auth_user_profile_success(self, authenticated_client):
         """Success: Get own user profile"""
-        url = reverse(f"{base_user_url}profile", kwargs={"pk": authenticated_client.user.pk})
+        url = reverse(f"{base_user_url}profile", kwargs={"user_id": authenticated_client.user.pk})
 
         response = authenticated_client.get(url)
 
@@ -73,7 +73,7 @@ class TestUserProfileViewGet:
     def test_get_profile_other_user_failure(self, authenticated_client):
         """Failure: Cannot get another user's profile"""
         other_user = UserFactory()
-        url = reverse(f"{base_user_url}profile", kwargs={"pk": other_user.pk})
+        url = reverse(f"{base_user_url}profile", kwargs={"user_id": other_user.pk})
 
         response = authenticated_client.get(url)
 
@@ -86,7 +86,7 @@ class TestUserProfileViewPut:
 
     def test_put_profile_success(self, authenticated_client):
         """Success: Update entire user profile"""
-        url = reverse(f"{base_user_url}profile", kwargs={"pk": authenticated_client.user.pk})
+        url = reverse(f"{base_user_url}profile", kwargs={"user_id": authenticated_client.user.pk})
         data = {
             "username": fake.user_name(),
             "email": fake.email(),
@@ -105,7 +105,7 @@ class TestUserProfileViewPut:
     def test_put_profile_failure_other_user(self, authenticated_client):
         """Failure: Cannot update another user's profile"""
         other_user = UserFactory()
-        url = reverse(f"{base_user_url}profile", kwargs={"pk": other_user.pk})
+        url = reverse(f"{base_user_url}profile", kwargs={"user_id": other_user.pk})
         data = {
             "username": fake.user_name(),
             "email": fake.email(),
@@ -135,7 +135,7 @@ class TestUserProfileViewPatch:
 
     def test_patch_profile_success(self, authenticated_client):
         """Success: Partially update user profile"""
-        url = reverse(f"{base_user_url}profile", kwargs={"pk": authenticated_client.user.pk})
+        url = reverse(f"{base_user_url}profile", kwargs={"user_id": authenticated_client.user.pk})
         new_email = fake.email()
         data = {
             "email": new_email,
@@ -151,7 +151,7 @@ class TestUserProfileViewPatch:
     def test_patch_profile_failure_unauthenticated(self, api_client):
         """Failure: Unauthenticated user cannot update profile"""
         test_user = UserFactory()
-        url = reverse(f"{base_user_url}profile", kwargs={"pk": test_user.pk})
+        url = reverse(f"{base_user_url}profile", kwargs={"user_id": test_user.pk})
         data = {
             "email": fake.email(),
         }
@@ -162,7 +162,7 @@ class TestUserProfileViewPatch:
 
     def test_patch_profile_consent_forced_false_under_15(self, authenticated_client):
         """Success: Consent is forced to False when updating date_of_birth to under 15"""
-        url = reverse(f"{base_user_url}profile", kwargs={"pk": authenticated_client.user.pk})
+        url = reverse(f"{base_user_url}profile", kwargs={"user_id": authenticated_client.user.pk})
         data = {
             "date_of_birth": self._get_date_of_birth_for_age(13),
             # User tries to keep consent, but should be forced to False
@@ -178,7 +178,7 @@ class TestUserProfileViewPatch:
 
     def test_put_profile_consent_allowed_15_and_over(self, authenticated_client):
         """Success: Consent is preserved when updating to 15 or older"""
-        url = reverse(f"{base_user_url}profile", kwargs={"pk": authenticated_client.user.pk})
+        url = reverse(f"{base_user_url}profile", kwargs={"user_id": authenticated_client.user.pk})
         data = {
             "date_of_birth": self._get_date_of_birth_for_age(16),
             "consent": True,
@@ -199,7 +199,7 @@ class TestUserProfileViewDelete:
     def test_delete_profile_success(self, authenticated_client):
         """Success: Delete own user account"""
         user_id = authenticated_client.user.pk
-        url = reverse(f"{base_user_url}profile", kwargs={"pk": user_id})
+        url = reverse(f"{base_user_url}profile", kwargs={"user_id": user_id})
 
         response = authenticated_client.delete(url)
 
@@ -211,7 +211,7 @@ class TestUserProfileViewDelete:
         """Failure: Cannot delete another user's account"""
 
         other_user = UserFactory()
-        url = reverse(f"{base_user_url}profile", kwargs={"pk": other_user.pk})
+        url = reverse(f"{base_user_url}profile", kwargs={"user_id": other_user.pk})
 
         response = authenticated_client.delete(url)
 
@@ -226,7 +226,7 @@ class TestGDPRExportView:
 
     def test_gdpr_export_success(self, authenticated_client):
         """Success: Export own personal data"""
-        url = reverse(f"{base_user_url}gdpr-export", kwargs={"pk": authenticated_client.user.pk})
+        url = reverse(f"{base_user_url}gdpr-export", kwargs={"user_id": authenticated_client.user.pk})
 
         response = authenticated_client.get(url)
 
@@ -240,7 +240,7 @@ class TestGDPRExportView:
     def test_gdpr_export_other_user_failure(self, authenticated_client):
         """Failure: Cannot export another user's data"""
         other_user = UserFactory()
-        url = reverse(f"{base_user_url}gdpr-export", kwargs={"pk": other_user.pk})
+        url = reverse(f"{base_user_url}gdpr-export", kwargs={"user_id": other_user.pk})
 
         response = authenticated_client.get(url)
 

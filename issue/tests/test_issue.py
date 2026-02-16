@@ -50,7 +50,7 @@ class TestIssueRetrieve:
     def test_retrieve_issue_success(self, authenticated_client, create_project):
         """Success: Retrieve an issue where user is contributor"""
         issue = IssueFactory(project=create_project, author=authenticated_client.user)
-        url = reverse(f"{base_url}issue-detail", kwargs={"project_id": create_project.pk, "pk": issue.pk})
+        url = reverse(f"{base_url}issue-detail", kwargs={"project_id": create_project.pk, "issue_id": issue.pk})
 
         response = authenticated_client.get(url)
 
@@ -65,7 +65,7 @@ class TestIssueRetrieve:
         other_project = ProjectFactory(author=other_author)
         issue = IssueFactory(project=other_project, author=other_author)
 
-        url = reverse(f"{base_url}issue-detail", kwargs={"project_id": other_project.pk, "pk": issue.pk})
+        url = reverse(f"{base_url}issue-detail", kwargs={"project_id": other_project.pk, "issue_id": issue.pk})
 
         response = authenticated_client.get(url)
 
@@ -124,7 +124,7 @@ class TestIssueUpdate:
     def test_update_issue_success(self, authenticated_client, create_project):
         """Success: Author can update their issue"""
         issue = IssueFactory(project=create_project, author=authenticated_client.user)
-        url = reverse(f"{base_url}issue-detail", kwargs={"project_id": create_project.pk, "pk": issue.pk})
+        url = reverse(f"{base_url}issue-detail", kwargs={"project_id": create_project.pk, "issue_id": issue.pk})
         data = {
             "title": fake.sentence(),
             "content": fake.text(),
@@ -145,7 +145,7 @@ class TestIssueUpdate:
         create_project.contributors.add(other_contributor)
         issue = IssueFactory(project=create_project, author=other_contributor)
 
-        url = reverse(f"{base_url}issue-detail", kwargs={"project_id": create_project.pk, "pk": issue.pk})
+        url = reverse(f"{base_url}issue-detail", kwargs={"project_id": create_project.pk, "issue_id": issue.pk})
         data = {
             "title": fake.sentence(),
             "content": fake.text(),
@@ -166,7 +166,7 @@ class TestIssuePatch:
     def test_patch_issue_success(self, authenticated_client, create_project):
         """Success: Author can partially update their issue"""
         issue = IssueFactory(project=create_project, author=authenticated_client.user)
-        url = reverse(f"{base_url}issue-detail", kwargs={"project_id": create_project.pk, "pk": issue.pk})
+        url = reverse(f"{base_url}issue-detail", kwargs={"project_id": create_project.pk, "issue_id": issue.pk})
         data = {
             "title": fake.sentence(),
         }
@@ -184,7 +184,7 @@ class TestIssuePatch:
         create_project.contributors.add(other_contributor)
         issue = IssueFactory(project=create_project, author=other_contributor)
 
-        url = reverse(f"{base_url}issue-detail", kwargs={"project_id": create_project.pk, "pk": issue.pk})
+        url = reverse(f"{base_url}issue-detail", kwargs={"project_id": create_project.pk, "issue_id": issue.pk})
         data = {
             "title": fake.sentence(),
         }
@@ -202,7 +202,7 @@ class TestIssueDelete:
         """Success: Author can delete their issue"""
         issue = IssueFactory(project=create_project, author=authenticated_client.user)
         issue_id = issue.pk
-        url = reverse(f"{base_url}issue-detail", kwargs={"project_id": create_project.pk, "pk": issue_id})
+        url = reverse(f"{base_url}issue-detail", kwargs={"project_id": create_project.pk, "issue_id": issue_id})
 
         response = authenticated_client.delete(url)
 
@@ -215,7 +215,7 @@ class TestIssueDelete:
         create_project.contributors.add(other_contributor)
         issue = IssueFactory(project=create_project, author=other_contributor)
 
-        url = reverse(f"{base_url}issue-detail", kwargs={"project_id": create_project.pk, "pk": issue.pk})
+        url = reverse(f"{base_url}issue-detail", kwargs={"project_id": create_project.pk, "issue_id": issue.pk})
 
         response = authenticated_client.delete(url)
 

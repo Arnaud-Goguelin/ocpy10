@@ -53,7 +53,7 @@ class TestCommentRetrieve:
         comment = CommentFactory(issue=issue, author=authenticated_client.user)
         url = reverse(
             f"{base_url}detail",
-            kwargs={"project_id": create_project.pk, "issue_id": issue.pk, "pk": comment.pk},
+            kwargs={"project_id": create_project.pk, "issue_id": issue.pk, "comment_id": comment.pk},
         )
 
         response = authenticated_client.get(url)
@@ -72,7 +72,7 @@ class TestCommentRetrieve:
 
         url = reverse(
             f"{base_url}detail",
-            kwargs={"project_id": other_project.pk, "issue_id": issue.pk, "pk": comment.pk},
+            kwargs={"project_id": other_project.pk, "issue_id": issue.pk, "comment_id": comment.pk},
         )
 
         response = authenticated_client.get(url)
@@ -130,7 +130,7 @@ class TestCommentUpdate:
         comment = CommentFactory(issue=issue, author=authenticated_client.user)
         url = reverse(
             f"{base_url}detail",
-            kwargs={"project_id": create_project.pk, "issue_id": issue.pk, "pk": comment.pk},
+            kwargs={"project_id": create_project.pk, "issue_id": issue.pk, "comment_id": comment.pk},
         )
         data = {
             "title": fake.sentence(),
@@ -152,7 +152,7 @@ class TestCommentUpdate:
 
         url = reverse(
             f"{base_url}detail",
-            kwargs={"project_id": create_project.pk, "issue_id": issue.pk, "pk": comment.pk},
+            kwargs={"project_id": create_project.pk, "issue_id": issue.pk, "comment_id": comment.pk},
         )
         data = {
             "title": fake.sentence(),
@@ -174,7 +174,7 @@ class TestCommentPatch:
         comment = CommentFactory(issue=issue, author=authenticated_client.user)
         url = reverse(
             f"{base_url}detail",
-            kwargs={"project_id": create_project.pk, "issue_id": issue.pk, "pk": comment.pk},
+            kwargs={"project_id": create_project.pk, "issue_id": issue.pk, "comment_id": comment.pk},
         )
         data = {
             "title": fake.sentence(),
@@ -196,7 +196,7 @@ class TestCommentPatch:
 
         url = reverse(
             f"{base_url}detail",
-            kwargs={"project_id": create_project.pk, "issue_id": issue.pk, "pk": comment.pk},
+            kwargs={"project_id": create_project.pk, "issue_id": issue.pk, "comment_id": comment.pk},
         )
         data = {
             "title": fake.sentence(),
@@ -218,7 +218,7 @@ class TestCommentDelete:
         comment_id = comment.pk
         url = reverse(
             f"{base_url}detail",
-            kwargs={"project_id": create_project.pk, "issue_id": issue.pk, "pk": comment_id},
+            kwargs={"project_id": create_project.pk, "issue_id": issue.pk, "comment_id": comment_id},
         )
 
         response = authenticated_client.delete(url)
@@ -235,7 +235,7 @@ class TestCommentDelete:
 
         url = reverse(
             f"{base_url}detail",
-            kwargs={"project_id": create_project.pk, "issue_id": issue.pk, "pk": comment.pk},
+            kwargs={"project_id": create_project.pk, "issue_id": issue.pk, "comment_id": comment.pk},
         )
 
         response = authenticated_client.delete(url)

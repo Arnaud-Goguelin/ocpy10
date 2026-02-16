@@ -1,6 +1,6 @@
 #!/bin/sh
 
-echo "Background scheduler started"
+echo "Background scheduler started: delete expired DRF tokens every day at 03:00 am"
 
 while true; do
 
