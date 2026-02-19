@@ -35,43 +35,39 @@ class UserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Date of birth cannot be in the future.")
         return value
 
-    def create(self, validated_data):
-        """
-        Create user with automatic consent based on age.
-        If age < 15, consent is forced to False.
-        """
+    def validate_consent(self, value: bool) -> bool:
+        """Ensure consent cannot be True if user is under 15 years old"""
+        if not value:
+            return value
 
+        # Determine the date_of_birth to check
+        date_of_birth = self.initial_data.get("date_of_birth")
+
+        # If date_of_birth is not being updated, use existing value
+        if not date_of_birth and self.instance:
+            date_of_birth = self.instance.date_of_birth
+
+        # if date of birth comes from initial data, it is a string, need to convert it to datetime
+        if isinstance(date_of_birth, str):
+            date_of_birth = date.fromisoformat(date_of_birth)
+
+        age = User.calculate_age(date_of_birth)
+
+        if age < 15:
+            value = False
+
+        return value
+
+    def create(self, validated_data):
         # hass password
         # and ensure it is present to create a User object
         password = validated_data.pop("password", None)
         if not password:
             raise serializers.ValidationError("Password is required.")
 
-        # Calculate age and set consent accordingly
-        date_of_birth = validated_data.get("date_of_birth")
-
-        if date_of_birth:
-            age = User.calculate_age(date_of_birth)
-
-            if age < 15 or "consent" not in validated_data:
-                validated_data["consent"] = False
-
         return User.objects.create_user(password=password, **validated_data)
 
     def update(self, instance: User, validated_data):
-        """
-        Update user, re-check consent if date_of_birth is updated.
-        """
-        # Re-check age if date_of_birth is being updated
-        date_of_birth = validated_data.get("date_of_birth", instance.date_of_birth)
-
-        if date_of_birth and date_of_birth != instance.date_of_birth:
-            age = User.calculate_age(date_of_birth)
-
-            # Force consent to False if user becomes under 15
-            if age < 15:
-                validated_data["consent"] = False
-
         # hash password
         password = validated_data.pop("password", None)
         if password:
@@ -79,9 +75,7 @@ class UserSerializer(serializers.ModelSerializer):
 
         # Update other fields
         for attr, value in validated_data.items():
-            if attr != "password":
-                print(attr)
-                setattr(instance, attr, value)
+            setattr(instance, attr, value)
 
         instance.save()
         return instance
