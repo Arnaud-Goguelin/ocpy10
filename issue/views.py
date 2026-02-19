@@ -100,7 +100,6 @@ class IssueModelViewSet(ProjectMixin, ModelViewSet):
         summary="Create an Comment",
         tags=["Comment"],
         parameters=[
-            DocsTypingParameters.comment_id.value,
             DocsTypingParameters.issue_id.value,
             DocsTypingParameters.project_id.value,
         ],
