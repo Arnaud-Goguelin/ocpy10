@@ -85,7 +85,6 @@ class ProjectModelViewSet(ModelViewSet):
         summary="Create a Project",
         tags=["Project-Contributor"],
         parameters=[
-            DocsTypingParameters.contributor_id.value,
             DocsTypingParameters.project_id.value,
         ],
     ),
