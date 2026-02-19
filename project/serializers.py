@@ -17,8 +17,9 @@ class ProjectSerializer(ModelSerializer):
         extra_kwargs = {"author": {"required": False}}
 
     def create(self, validated_data):
-        # Automatically set author
+        # Automatically set user as author and contributor
         validated_data["author"] = self.context["request"].user
+        validated_data["contributors"] = [self.context["request"].user]
         return super().create(validated_data)
 
 
